@@ -1,10 +1,17 @@
-const { hash } = require('bcryptjs')
 const AppError = require('../utils/AppError')
 
 const UserCreateService = require('./UserCreateService')
 const UserRepositoryInMemory = require('../repositories/UserRepositoryInMemory')
 
 describe('UserCreateService', () => {
+  let userRepositoryInMemory = null
+  let userCreateService = null
+
+  beforeEach(() => {
+    userRepositoryInMemory = new UserRepositoryInMemory()
+    userCreateService = new UserCreateService(userRepositoryInMemory)
+  })
+
   it('user should be create', async () => {
     const user = {
       name: 'User Test',
@@ -12,10 +19,7 @@ describe('UserCreateService', () => {
       password: '123456'
     }
 
-    const userRepositoryInMemory = new UserRepositoryInMemory()
-    const userCreateService = new UserCreateService(userRepositoryInMemory)
     const userCreated = await userCreateService.execute(user)
-
     expect(userCreated).toHaveProperty('id')
   })
 
@@ -31,9 +35,6 @@ describe('UserCreateService', () => {
       email: 'user@teste.com',
       password: '123456'
     }
-
-    const userRepositoryInMemory = new UserRepositoryInMemory()
-    const userCreateService = new UserCreateService(userRepositoryInMemory)
 
     await userCreateService.execute(user)
     await expect(userCreateService.execute(user2)).rejects.toEqual(
